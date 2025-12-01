@@ -1,4 +1,5 @@
-import { Student, DocumentItem, CalendarEvent, CarouselImage } from '../types';
+
+import { Student, DocumentItem, CalendarEvent, CarouselImage, CurriculumSubject } from '../types';
 
 export const mockStudent: Student = {
   id: 'ST-2023-001',
@@ -10,7 +11,11 @@ export const mockStudent: Student = {
   classGrade: 'Grade 3 - A',
   age: 8,
   fatherName: 'Rajesh Sharma',
+  fatherPhone: '+91 98765 43210',
+  fatherEmail: 'rajesh.s@example.com',
   motherName: 'Priya Sharma',
+  motherPhone: '+91 98765 43211',
+  motherEmail: 'priya.s@example.com',
   guardianName: 'N/A'
 };
 
@@ -26,10 +31,6 @@ export const mockDocuments: DocumentItem[] = [
   { id: 'r1', title: 'Progress Report', date: '2023-09-30', type: 'report', url: '#', term: 'Term I' },
   { id: 'r2', title: 'Assessment Sheet', date: '2023-12-20', type: 'report', url: '#', term: 'Term II' },
   
-  // Curriculum
-  { id: 'c1', title: 'Grade 3 Math Syllabus', date: '2023-06-01', type: 'curriculum', url: '#' },
-  { id: 'c2', title: 'Science Topics Breakdown', date: '2023-06-01', type: 'curriculum', url: '#' },
-
   // Fees
   { id: 'f1', title: 'Tuition Fee Receipt', date: '2023-06-05', type: 'fee', url: '#', term: 'Term I' },
   { id: 'f2', title: 'Bus Fee Receipt', date: '2023-06-05', type: 'fee', url: '#', term: 'Term I' },
@@ -50,4 +51,64 @@ export const mockEvents: CalendarEvent[] = [
   { id: 'e6', title: 'Sports Day', date: '2023-12-05', type: 'school' },
   { id: 'e7', title: 'Science Fair', date: '2024-02-28', type: 'academic' },
   { id: 'e8', title: 'Annual Day', date: '2024-03-15', type: 'school' },
+];
+
+export const mockCurriculumSubjects: CurriculumSubject[] = [
+  {
+    id: 'math',
+    name: 'Mathematics',
+    description: 'Grade 3 Mathematics focuses on strengthening foundational concepts in arithmetic, introducing basic geometry, and developing logical reasoning skills through practical problem-solving.',
+    units: [
+      {
+        title: 'Unit 1: Number Systems',
+        topics: ['4-digit numbers', 'Place Value & Face Value', 'Rounding off', 'Roman Numerals']
+      },
+      {
+        title: 'Unit 2: Basic Operations',
+        topics: ['Addition & Subtraction of 4-digit numbers', 'Multiplication Tables (1-15)', 'Simple Division', 'Word Problems']
+      },
+      {
+        title: 'Unit 3: Geometry',
+        topics: ['Point, Line, and Ray', '2D Shapes and properties', 'Introduction to 3D Shapes', 'Measuring Length']
+      }
+    ]
+  },
+  {
+    id: 'science',
+    name: 'Environmental Science',
+    description: 'The EVS curriculum is designed to help students understand their surroundings, the importance of nature, basic biological processes, and community living.',
+    units: [
+      {
+        title: 'Unit 1: Our Environment',
+        topics: ['Living and Non-living things', 'Plants around us', 'Animals and their homes', 'Saving Water']
+      },
+      {
+        title: 'Unit 2: The Human Body',
+        topics: ['Sense Organs', 'Internal Organs', 'Health and Hygiene', 'Food and Nutrition']
+      },
+      {
+        title: 'Unit 3: Matter and Materials',
+        topics: ['Solids, Liquids, and Gases', 'Types of houses', 'Clothing materials']
+      }
+    ]
+  },
+  {
+    id: 'english',
+    name: 'English Language',
+    description: 'English curriculum aims to enhance communication skills through reading comprehension, grammar usage, creative writing, and vocabulary building.',
+    units: [
+      {
+        title: 'Unit 1: Grammar',
+        topics: ['Nouns (Common, Proper, Collective)', 'Verbs and Tenses', 'Adjectives', 'Punctuation']
+      },
+      {
+        title: 'Unit 2: Literature',
+        topics: ['Story: The Magic Garden', 'Poem: Bird Talk', 'Story: Nina and the Baby Sparrows']
+      },
+      {
+        title: 'Unit 3: Composition',
+        topics: ['Paragraph Writing', 'Picture Composition', 'Informal Letters']
+      }
+    ]
+  }
 ];

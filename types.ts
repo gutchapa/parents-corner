@@ -1,3 +1,4 @@
+
 export interface Student {
   id: string;
   name: string;
@@ -8,8 +9,14 @@ export interface Student {
   classGrade: string;
   age: number;
   fatherName: string;
+  fatherPhone: string;
+  fatherEmail: string;
   motherName: string;
+  motherPhone: string;
+  motherEmail: string;
   guardianName: string;
+  guardianPhone?: string;
+  guardianEmail?: string;
 }
 
 export interface DocumentItem {
@@ -34,6 +41,18 @@ export interface CarouselImage {
   id: string;
   url: string;
   alt: string;
+}
+
+export interface CurriculumUnit {
+  title: string;
+  topics: string[];
+}
+
+export interface CurriculumSubject {
+  id: string;
+  name: string;
+  description: string;
+  units: CurriculumUnit[];
 }
 
 export type TabType = 'reports' | 'curriculum' | 'academic_calendar' | 'school_calendar' | 'fees' | 'newsletter';

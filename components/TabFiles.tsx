@@ -11,14 +11,21 @@ interface TabFilesProps {
 }
 
 const TabFiles: React.FC<TabFilesProps> = ({ documents, type, showTerm, showMonthFilter }) => {
-  const [selectedMonth, setSelectedMonth] = useState<string>(MONTHS[6]); // Default to July (current academic start) or first month
+  const [selectedMonth, setSelectedMonth] = useState<string>(MONTHS[6]); // Default to July
+  const [selectedTerm, setSelectedTerm] = useState<string>('All');
   const [viewingDoc, setViewingDoc] = useState<DocumentItem | null>(null);
 
-  // Filter based on props
+  // Filter based on type
   let filteredDocs = documents.filter(doc => doc.type === type);
 
+  // Filter based on Month (for Newsletters)
   if (showMonthFilter) {
     filteredDocs = filteredDocs.filter(doc => doc.month === selectedMonth);
+  }
+
+  // Filter based on Term (for Reports)
+  if (type === 'report' && selectedTerm !== 'All') {
+    filteredDocs = filteredDocs.filter(doc => doc.term === selectedTerm);
   }
 
   const handleRead = (doc: DocumentItem) => {
@@ -31,30 +38,55 @@ const TabFiles: React.FC<TabFilesProps> = ({ documents, type, showTerm, showMont
 
   return (
     <div className="space-y-4">
-      {/* Month Filter for Newsletter */}
-      {showMonthFilter && (
-        <div className="w-full max-w-xs mb-6">
-           <label className="block text-sm font-medium text-stone-700 mb-2">Filter by Month</label>
-           <div className="relative">
-            <select 
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="block w-full appearance-none bg-white border border-stone-300 px-4 py-2 pr-8 rounded-lg shadow-sm focus:border-brand-500 focus:ring-brand-500 text-stone-700"
-            >
-              {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-stone-700">
-               <ChevronDown className="h-4 w-4" />
+      {/* Filters Container */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* Month Filter for Newsletter */}
+        {showMonthFilter && (
+          <div className="w-full max-w-xs">
+            <label className="block text-sm font-medium text-stone-700 mb-2">Filter by Month</label>
+            <div className="relative">
+              <select 
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="block w-full appearance-none bg-white border border-stone-300 px-4 py-2 pr-8 rounded-lg shadow-sm focus:border-brand-500 focus:ring-brand-500 text-stone-700 outline-none"
+              >
+                {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-stone-700">
+                <ChevronDown className="h-4 w-4" />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Term Filter for Reports */}
+        {type === 'report' && (
+          <div className="w-full max-w-xs">
+            <label className="block text-sm font-medium text-stone-700 mb-2">Filter by Term</label>
+            <div className="relative">
+              <select 
+                value={selectedTerm}
+                onChange={(e) => setSelectedTerm(e.target.value)}
+                className="block w-full appearance-none bg-white border border-stone-300 px-4 py-2 pr-8 rounded-lg shadow-sm focus:border-brand-500 focus:ring-brand-500 text-stone-700 outline-none"
+              >
+                <option value="All">All Terms</option>
+                <option value="Term I">Term I</option>
+                <option value="Term II">Term II</option>
+                <option value="Term III">Term III</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-stone-700">
+                <ChevronDown className="h-4 w-4" />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* List */}
       <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
         {filteredDocs.length === 0 ? (
           <div className="p-8 text-center text-stone-400">
-            No documents found for this category.
+            No documents found for this selection.
           </div>
         ) : (
           <ul className="divide-y divide-stone-100">
@@ -138,7 +170,7 @@ const TabFiles: React.FC<TabFilesProps> = ({ documents, type, showTerm, showMont
                      <p className="text-stone-500 font-medium">{viewingDoc.month} Edition</p>
                    </div>
                    <div className="text-right">
-                     <p className="font-serif italic text-stone-400">Bodhana Learning Tree</p>
+                     <p className="font-serif italic text-stone-400">Bodhana & Learning Tree Montessori</p>
                    </div>
                 </div>
                 

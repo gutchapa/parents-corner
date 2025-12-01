@@ -44,7 +44,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
              </svg>
           </div>
-          <h1 className="text-2xl font-bold text-stone-800">Bodhana Learning Tree</h1>
+          <h1 className="text-2xl font-bold text-stone-800">Bodhana & Learning Tree Montessori</h1>
           <p className="text-stone-500 mt-2">Parents Corner Login</p>
         </div>
 
