@@ -55,4 +55,16 @@ export interface CurriculumSubject {
   units: CurriculumUnit[];
 }
 
+export interface MeetingSlot {
+  id: string;
+  time: string; // "10:00 AM"
+  isBooked: boolean;
+  bookedByCurrentUser?: boolean;
+}
+
+export interface DailySchedule {
+  date: string; // YYYY-MM-DD
+  slots: MeetingSlot[];
+}
+
 export type TabType = 'reports' | 'curriculum' | 'academic_calendar' | 'school_calendar' | 'fees' | 'newsletter';

@@ -1,7 +1,8 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Student } from '../types';
 import { LogOut, User, CalendarCheck } from './Icons';
-import { CALENDLY_URL } from '../constants';
+import MeetingScheduler from './MeetingScheduler';
 
 interface StudentProfileProps {
   student: Student;
@@ -9,13 +10,15 @@ interface StudentProfileProps {
 }
 
 const StudentProfile: React.FC<StudentProfileProps> = ({ student, onLogout }) => {
+  const [showScheduler, setShowScheduler] = useState(false);
+
   return (
     <div className="relative mt-16 mb-8">
       {/* Action Buttons - Absolute Top Right of the card container */}
       <div className="absolute -top-12 right-0 md:top-4 md:right-4 z-20 flex gap-2 md:gap-3">
         {/* Schedule Meeting Button */}
         <button 
-          onClick={() => window.open(CALENDLY_URL, '_blank')}
+          onClick={() => setShowScheduler(true)}
           className="flex items-center gap-2 text-brand-600 hover:text-brand-800 transition-colors bg-white/80 backdrop-blur px-3 py-1 rounded-full text-sm font-medium shadow-sm border border-brand-100"
           title="Schedule Meeting"
         >
@@ -157,6 +160,15 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onLogout }) =>
         </div>
 
       </div>
+
+      {/* Custom Meeting Scheduler Modal */}
+      {showScheduler && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+           <div className="bg-white w-full max-w-4xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden relative">
+             <MeetingScheduler onClose={() => setShowScheduler(false)} />
+           </div>
+        </div>
+      )}
     </div>
   );
 };

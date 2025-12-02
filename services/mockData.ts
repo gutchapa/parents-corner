@@ -1,4 +1,5 @@
-import { Student, DocumentItem, CalendarEvent, CarouselImage, CurriculumSubject } from '../types';
+
+import { Student, DocumentItem, CalendarEvent, CarouselImage, CurriculumSubject, DailySchedule } from '../types';
 
 export const mockStudent: Student = {
   id: 'ST-2023-001',
@@ -111,3 +112,31 @@ export const mockCurriculumSubjects: CurriculumSubject[] = [
     ]
   }
 ];
+
+// Helper to generate slots
+const generateSlots = (dateStr: string, bookedIndex: number = -1) => {
+  const times = ['09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM'];
+  return times.map((t, i) => ({
+    id: `${dateStr}-${i}`,
+    time: t,
+    isBooked: i === bookedIndex, // Simulate one booked slot
+    bookedByCurrentUser: false
+  }));
+};
+
+// Generate some mock schedule data for the next few days
+const today = new Date();
+const dates: DailySchedule[] = [];
+for (let i = 0; i < 7; i++) {
+  const d = new Date(today);
+  d.setDate(today.getDate() + i + 1); // Start from tomorrow
+  const dateStr = d.toISOString().split('T')[0];
+  const slots = generateSlots(dateStr, (i % 3) + 1); // Randomly book some slots
+  dates.push({ date: dateStr, slots });
+}
+
+// Manually add a booking for the current user to demonstrate that feature
+dates[0].slots[0].isBooked = true;
+dates[0].slots[0].bookedByCurrentUser = true;
+
+export const mockMeetingSchedule: DailySchedule[] = dates;
