@@ -3,7 +3,7 @@ import { Student, DocumentItem, CalendarEvent, CarouselImage, CurriculumSubject 
 export const mockStudent: Student = {
   id: 'ST-2023-001',
   name: 'Layaa Ramesh',
-  photoUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80',
+  photoUrl: '',
   dob: '2016-05-15',
   doj: '2020-06-01',
   admissionNo: 'BLT-2458',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Student } from '../types';
-import { LogOut } from './Icons';
+import { LogOut, User } from './Icons';
 
 interface StudentProfileProps {
   student: Student;
@@ -25,12 +25,16 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onLogout }) =>
       <div className="bg-white rounded-3xl shadow-sm border border-stone-200 pt-20 pb-8 px-4 md:px-10 relative">
         {/* Photo Section - Centered Absolute Top */}
         <div className="absolute -top-16 left-1/2 transform -translate-x-1/2">
-          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg overflow-hidden bg-brand-50">
-            <img 
-              src={student.photoUrl} 
-              alt={student.name} 
-              className="w-full h-full object-cover"
-            />
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg overflow-hidden bg-brand-50 flex items-center justify-center">
+            {student.photoUrl ? (
+              <img 
+                src={student.photoUrl} 
+                alt={student.name} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <User className="w-16 h-16 text-brand-200" />
+            )}
           </div>
         </div>
 
