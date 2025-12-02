@@ -1,5 +1,5 @@
 
-import { Student, DocumentItem, CalendarEvent, CarouselImage, CurriculumSubject, DailySchedule } from '../types';
+import { Student, DocumentItem, CalendarEvent, CarouselImage, CurriculumSubject, DailySchedule, MeetingSlot } from '../types';
 
 export const mockStudent: Student = {
   id: 'ST-2023-001',
@@ -113,30 +113,52 @@ export const mockCurriculumSubjects: CurriculumSubject[] = [
   }
 ];
 
-// Helper to generate slots
-const generateSlots = (dateStr: string, bookedIndex: number = -1) => {
-  const times = ['09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM'];
-  return times.map((t, i) => ({
-    id: `${dateStr}-${i}`,
-    time: t,
-    isBooked: i === bookedIndex, // Simulate one booked slot
-    bookedByCurrentUser: false
-  }));
+// --- MEETING SCHEDULER SIMULATION ---
+
+// Time slots for a standard day - 15 minute intervals
+const STANDARD_SLOTS = [
+  '09:00 AM', '09:15 AM', '09:30 AM', '09:45 AM', 
+  '10:00 AM', '10:15 AM', '10:30 AM', '10:45 AM',
+  '11:00 AM', '11:15 AM', '11:30 AM', '11:45 AM',
+  '02:00 PM', '02:15 PM', '02:30 PM', '02:45 PM',
+  '03:00 PM', '03:15 PM', '03:30 PM', '03:45 PM'
+];
+
+/**
+ * Simulates fetching slots from a Google Calendar backend.
+ * Generates random availability for the given date.
+ */
+export const fetchSlotsForDate = async (dateStr: string): Promise<MeetingSlot[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const date = new Date(dateStr);
+      const dayOfWeek = date.getDay(); // 0 = Sun, 6 = Sat
+
+      // Weekend logic: No slots on Sunday (0) or Saturday (6)
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        resolve([]);
+        return;
+      }
+
+      // Generate slots
+      // To simulate "Real" calendar, we deterministically seed randomness based on date string
+      // So checking the same date twice returns same slots.
+      const seed = dateStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      
+      const slots: MeetingSlot[] = STANDARD_SLOTS.map((time, index) => {
+        const uniqueId = `${dateStr}-${time.replace(/[:\s]/g, '')}`;
+        // Randomly mark some as booked based on seed
+        const isBooked = ((seed + index) % 5 === 0); // Less blocked slots for more options
+        
+        return {
+          id: uniqueId,
+          time,
+          isBooked: isBooked, // True = Busy in Google Calendar
+          bookedByCurrentUser: false
+        };
+      });
+
+      resolve(slots);
+    }, 600); // Simulate network delay
+  });
 };
-
-// Generate some mock schedule data for the next few days
-const today = new Date();
-const dates: DailySchedule[] = [];
-for (let i = 0; i < 7; i++) {
-  const d = new Date(today);
-  d.setDate(today.getDate() + i + 1); // Start from tomorrow
-  const dateStr = d.toISOString().split('T')[0];
-  const slots = generateSlots(dateStr, (i % 3) + 1); // Randomly book some slots
-  dates.push({ date: dateStr, slots });
-}
-
-// Manually add a booking for the current user to demonstrate that feature
-dates[0].slots[0].isBooked = true;
-dates[0].slots[0].bookedByCurrentUser = true;
-
-export const mockMeetingSchedule: DailySchedule[] = dates;
