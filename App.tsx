@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import AdminPanel from './components/AdminPanel';
 import { 
   fetchStudentProfile, 
   fetchDocuments, 
@@ -12,6 +14,7 @@ import { Student, DocumentItem, CalendarEvent, CarouselImage } from './types';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState<'parent' | 'admin'>('parent');
   const [loading, setLoading] = useState(false);
   const [loginId, setLoginId] = useState<string>('');
 
@@ -21,19 +24,21 @@ const App: React.FC = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [carouselImages, setCarouselImages] = useState<CarouselImage[]>([]);
 
-  const handleLogin = (inputId: string) => {
-    setLoginId(inputId);
+  const handleLogin = (role: 'parent' | 'admin') => {
+    setUserRole(role);
     setIsAuthenticated(true);
+    setLoginId('demo-user'); // In real app, pass actual ID
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setStudent(null);
+    setUserRole('parent');
   };
 
   // Fetch Data upon Authentication
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && userRole === 'parent') {
       const loadData = async () => {
         setLoading(true);
         try {
@@ -61,15 +66,18 @@ const App: React.FC = () => {
 
       loadData();
     }
-  }, [isAuthenticated, loginId]);
+  }, [isAuthenticated, userRole, loginId]);
 
   if (!isAuthenticated) {
-    // We pass a dummy function for now as Login component handles the input internally
-    // In a real auth flow, Login would pass the ID back up.
-    // For this prototype, Login.tsx calls onLogin without args, so we wrapper it.
-    return <Login onLogin={() => handleLogin('demo-user')} />;
+    return <Login onLogin={handleLogin} />;
   }
 
+  // Render Admin Panel
+  if (userRole === 'admin') {
+    return <AdminPanel onLogout={handleLogout} />;
+  }
+
+  // Render Parent Dashboard
   if (loading || !student) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-brand-50">

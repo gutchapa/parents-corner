@@ -229,3 +229,31 @@ The current application uses a **simulation** (`services/googleCalendarService.t
     ```
 
 This ensures your Google Calendar credentials remain secure on the server while providing a seamless booking experience for parents.
+
+---
+
+## 5. How to Import Calendars from Drive (CSV)
+
+To populate the **School Calendar** and **Academic Calendar** tabs in the app, you need to import the data into the Supabase `events` table. You cannot upload a PDF directly to the interactive grid.
+
+1.  **Prepare a CSV File** (e.g., using Excel or Google Sheets) with the following headers:
+    
+    ```csv
+    title,date,type,description
+    School Reopens,2024-06-12,school,Start of new academic year
+    Unit Test 1,2024-07-15,academic,Covers first 3 chapters
+    Independence Day,2024-08-15,school,Flag hoisting at 8 AM
+    Term 1 Exam,2024-09-20,academic,
+    ```
+
+    *   `date` format must be `YYYY-MM-DD`.
+    *   `type` must be exactly `school` or `academic`.
+
+2.  **Go to Supabase Dashboard**:
+    *   Navigate to **Table Editor**.
+    *   Select the `events` table.
+    *   Click **Import Data**.
+    *   Upload your CSV file.
+
+3.  **Result**:
+    *   The app will automatically read these rows and populate the Monthly Grid View with the correct dots and event lists.
