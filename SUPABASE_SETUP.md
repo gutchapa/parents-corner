@@ -1,6 +1,6 @@
-# Supabase & Google Calendar Setup Guide
+# Supabase & Application Setup Guide
 
-This document outlines the database schema, storage configuration, and integration architecture required to move the **Bodhana & Learning Tree Montessori** dashboard from Mock Data to a Production Environment.
+This document outlines the database schema, storage configuration, and administrative workflows for the **Bodhana & Learning Tree Montessori** dashboard.
 
 ---
 
@@ -48,7 +48,7 @@ Stores metadata for PDFs (Reports, Fees, Newsletters).
 | `month` | `text` | e.g., "June", "July" (for newsletters) |
 
 #### `events`
-Stores Academic and School events.
+Stores Academic and School events for the Calendar Tabs.
 
 | Column | Type | Description |
 | :--- | :--- | :--- |
@@ -59,7 +59,7 @@ Stores Academic and School events.
 | `description` | `text` | Optional details |
 
 #### `curriculum`
-Stores subject details. Using JSONB for flexible unit structures.
+Stores subject details.
 
 | Column | Type | Description |
 | :--- | :--- | :--- |
@@ -151,20 +151,15 @@ alter table public.curriculum enable row level security;
 alter table public.carousel_images enable row level security;
 
 -- 7. Policies (Simplified for 'Parents Corner' read-only access)
--- In a real app, you would restrict 'students' table based on authenticated user ID.
--- For this demo/public facing portal structure:
-
--- Allow public read access to general school data
 create policy "Public events" on public.events for select using (true);
 create policy "Public carousel" on public.carousel_images for select using (true);
 create policy "Public curriculum" on public.curriculum for select using (true);
-
--- Allow read access to documents if they are public newsletters OR belong to the user
--- (Note: Requires Auth setup to filter by user_id effectively)
 create policy "Public newsletters" on public.documents for select using (type = 'newsletter');
-
--- For now, allowing select on students for the login lookup mechanism
 create policy "Allow lookup" on public.students for select using (true);
+
+-- 8. Allow Admin Insert (Warning: In production, enforce this via Auth Role)
+create policy "Allow insert events" on public.events for insert with check (true);
+create policy "Allow insert students" on public.students for insert with check (true);
 ```
 
 ---
@@ -179,81 +174,63 @@ Go to **Storage** in the Supabase Dashboard and create a new bucket named `schoo
 *   `/newsletters` - Newsletter PDFs
 *   `/events` - Event images
 
-Ensure the bucket is **Public** so the URLs generated can be accessed by the application.
+Ensure the bucket is **Public**.
 
 ---
 
-## 4. Google Calendar Integration Architecture
+## 4. Admin Workflow: Importing Calendars
 
-The current application uses a **simulation** (`services/googleCalendarService.ts`) to mimic Google Calendar's behavior. To make this real, you cannot store your Google Cloud Secrets in the frontend `index.tsx` or `mockData.ts` files, as they would be visible to anyone.
+The app features an **Admin Panel** to easily upload data without needing to access the database directly.
 
-### Recommended Architecture: Supabase Edge Functions
+### Step 1: Prepare your Google Sheet (The "Master" Calendar)
+We recommend maintaining a Google Sheet for your school calendar. This serves as your source of truth.
 
-1.  **Google Cloud Console**:
-    *   Create a Project.
-    *   Enable **Google Calendar API**.
-    *   Create a **Service Account**.
-    *   Download the JSON Key file.
-    *   Share your specific Google Calendar (e.g., `principal@school.com`) with the Service Account email address.
+1.  Create a Google Sheet with exactly these 4 columns:
+    *   `title` (Name of the event)
+    *   `date` (Format: YYYY-MM-DD, e.g., 2024-06-15)
+    *   `type` (Values must be: `academic` or `school`)
+    *   `description` (Optional details)
 
-2.  **Supabase Edge Function (`/functions/calendar-api`)**:
-    *   Create a Deno/Node.js function in Supabase.
-    *   Store the Service Account JSON credentials in Supabase **Vault/Secrets**.
-    *   Implement 3 endpoints in this function:
-
-    **Endpoint A: GET /slots**
-    *   Accepts: `date`
-    *   Logic: Uses Service Account to query Google Calendar API (`events.list`) for "Busy" times on that date.
-    *   Returns: A list of available 15-min slots (filtering out the busy ones).
-
-    **Endpoint B: POST /book**
-    *   Accepts: `date`, `time`, `studentName`, `parentEmail`
-    *   Logic: Uses Service Account to `events.insert` into your Google Calendar.
-    *   Adds metadata to the event description (e.g., "Meeting with Layaa Ramesh's Parent").
-
-    **Endpoint C: POST /cancel**
-    *   Accepts: `eventId`
-    *   Logic: Calls `events.delete`.
-
-3.  **Frontend Update**:
-    *   Update `services/googleCalendarService.ts` to fetch from your Supabase Edge Function URL instead of generating random mock data.
-
-    ```typescript
-    // Example Frontend Code Update
-    const fetchSlotsForDate = async (date) => {
-      const response = await supabase.functions.invoke('calendar-api', {
-        body: { action: 'get-slots', date }
-      });
-      return response.data;
-    }
-    ```
-
-This ensures your Google Calendar credentials remain secure on the server while providing a seamless booking experience for parents.
-
----
-
-## 5. How to Import Calendars from Drive (CSV)
-
-To populate the **School Calendar** and **Academic Calendar** tabs in the app, you need to import the data into the Supabase `events` table. You cannot upload a PDF directly to the interactive grid.
-
-1.  **Prepare a CSV File** (e.g., using Excel or Google Sheets) with the following headers:
-    
+    **Example Rows:**
     ```csv
     title,date,type,description
-    School Reopens,2024-06-12,school,Start of new academic year
-    Unit Test 1,2024-07-15,academic,Covers first 3 chapters
-    Independence Day,2024-08-15,school,Flag hoisting at 8 AM
-    Term 1 Exam,2024-09-20,academic,
+    School Reopens,2024-06-12,school,New Academic Year
+    Unit Test 1,2024-07-15,academic,Math and Science
+    Independence Day,2024-08-15,school,Flag Hoisting
+    Term 1 Exam,2024-09-20,academic,All subjects
     ```
 
-    *   `date` format must be `YYYY-MM-DD`.
-    *   `type` must be exactly `school` or `academic`.
+### Step 2: Download as CSV
+In Google Sheets, go to **File > Download > Comma Separated Values (.csv)**.
 
-2.  **Go to Supabase Dashboard**:
-    *   Navigate to **Table Editor**.
-    *   Select the `events` table.
-    *   Click **Import Data**.
-    *   Upload your CSV file.
+### Step 3: Upload via Admin Panel
+1.  Open the App.
+2.  On the Login Screen, click **"Login as Admin"** at the bottom.
+3.  Enter Username: `admin` and any password.
+4.  In the Dashboard, locate the **"Upload Calendar Events"** box.
+5.  Select your CSV file.
+6.  The app will process the file and upload the events to Supabase instantly.
+7.  Parents will immediately see the updated calendar in their dashboard.
 
-3.  **Result**:
-    *   The app will automatically read these rows and populate the Monthly Grid View with the correct dots and event lists.
+---
+
+## 5. Google Calendar Integration (Meeting Scheduler)
+
+**Note:** The "Meeting Scheduler" feature (where parents book slots) is distinct from the "School Calendar" (Events list).
+
+*   **School Calendar**: Uses the CSV import method described above.
+*   **Meeting Scheduler**: Connects to the Principal/Teacher's Google Calendar to find free time slots.
+
+### Production Setup for Scheduler
+
+1.  **Google Cloud Console**:
+    *   Enable **Google Calendar API**.
+    *   Create a **Service Account** and download the JSON key.
+    *   Share your personal Google Calendar with the Service Account email address.
+
+2.  **Supabase Edge Function**:
+    *   Since the frontend cannot securely store the Google API Key, you must deploy a Supabase Edge Function (server-side code).
+    *   This function will accept a request (e.g., "Get Slots for 2024-06-15"), query Google, and return the busy/free times.
+
+3.  **Frontend Config**:
+    *   In `services/googleCalendarService.ts`, replace the `fetchSlotsForDate` mock function with a `fetch` call to your new Edge Function.
