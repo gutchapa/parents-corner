@@ -1,6 +1,7 @@
 import React from 'react';
 import { Student } from '../types';
-import { LogOut, User } from './Icons';
+import { LogOut, User, CalendarCheck } from './Icons';
+import { CALENDLY_URL } from '../constants';
 
 interface StudentProfileProps {
   student: Student;
@@ -10,11 +11,22 @@ interface StudentProfileProps {
 const StudentProfile: React.FC<StudentProfileProps> = ({ student, onLogout }) => {
   return (
     <div className="relative mt-16 mb-8">
-      {/* Logout Button - Absolute Top Right of the card container */}
-      <div className="absolute -top-12 right-0 md:top-4 md:right-4 z-20">
+      {/* Action Buttons - Absolute Top Right of the card container */}
+      <div className="absolute -top-12 right-0 md:top-4 md:right-4 z-20 flex gap-2 md:gap-3">
+        {/* Schedule Meeting Button */}
+        <button 
+          onClick={() => window.open(CALENDLY_URL, '_blank')}
+          className="flex items-center gap-2 text-brand-600 hover:text-brand-800 transition-colors bg-white/80 backdrop-blur px-3 py-1 rounded-full text-sm font-medium shadow-sm border border-brand-100"
+          title="Schedule Meeting"
+        >
+          <span className="hidden md:inline">Schedule Meeting</span>
+          <CalendarCheck className="w-4 h-4" />
+        </button>
+
+        {/* Logout Button */}
         <button 
           onClick={onLogout}
-          className="flex items-center gap-2 text-stone-500 hover:text-red-600 transition-colors bg-white/80 backdrop-blur px-3 py-1 rounded-full text-sm font-medium shadow-sm"
+          className="flex items-center gap-2 text-stone-500 hover:text-red-600 transition-colors bg-white/80 backdrop-blur px-3 py-1 rounded-full text-sm font-medium shadow-sm border border-stone-200"
           title="Logout"
         >
           <span className="hidden md:inline">Logout</span>

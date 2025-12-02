@@ -12,3 +12,6 @@ export const TABS = [
   { id: 'school_calendar', label: 'School Calendar' },
   { id: 'fees', label: 'Fees Receipts' },
 ] as const;
+
+// Replace this with your actual Calendly scheduling URL
+export const CALENDLY_URL = "https://calendly.com/";
