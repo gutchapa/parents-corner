@@ -2,23 +2,30 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-import AdminPanel from './components/AdminPanel';
 import { 
   fetchStudentProfile, 
   fetchDocuments, 
   fetchEvents, 
   fetchCarouselImages, 
-  fetchCurriculum 
 } from './services/dataService';
 import { Student, DocumentItem, CalendarEvent, CarouselImage } from './types';
+
+// Admin Imports (Simulating Next.js Routing)
+import AdminLayout from './app/admin/AdminLayout';
+import DashboardPage from './app/admin/DashboardPage';
+import StudentsPage from './app/admin/StudentsPage';
+import CalendarPage from './app/admin/CalendarPage';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<'parent' | 'admin'>('parent');
-  const [loading, setLoading] = useState(false);
   const [loginId, setLoginId] = useState<string>('');
+  
+  // Admin Routing State
+  const [adminPage, setAdminPage] = useState('dashboard');
 
   // Data State
+  const [loading, setLoading] = useState(false);
   const [student, setStudent] = useState<Student | null>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -27,13 +34,14 @@ const App: React.FC = () => {
   const handleLogin = (role: 'parent' | 'admin') => {
     setUserRole(role);
     setIsAuthenticated(true);
-    setLoginId('demo-user'); // In real app, pass actual ID
+    setLoginId('demo-user');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setStudent(null);
     setUserRole('parent');
+    setAdminPage('dashboard');
   };
 
   // Fetch Data upon Authentication
@@ -42,11 +50,9 @@ const App: React.FC = () => {
       const loadData = async () => {
         setLoading(true);
         try {
-          // 1. Fetch Student Profile based on login
           const studentData = await fetchStudentProfile(loginId);
           setStudent(studentData);
 
-          // 2. Fetch related data in parallel
           const [docsData, eventsData, imagesData] = await Promise.all([
             fetchDocuments(studentData.id),
             fetchEvents(),
@@ -72,12 +78,23 @@ const App: React.FC = () => {
     return <Login onLogin={handleLogin} />;
   }
 
-  // Render Admin Panel
+  // --- ADMIN PANEL ROUTER ---
   if (userRole === 'admin') {
-    return <AdminPanel onLogout={handleLogout} />;
+    return (
+      <AdminLayout 
+        onLogout={handleLogout} 
+        currentPage={adminPage} 
+        onNavigate={setAdminPage}
+      >
+        {adminPage === 'dashboard' && <DashboardPage />}
+        {adminPage === 'students' && <StudentsPage />}
+        {adminPage === 'calendar' && <CalendarPage />}
+        {adminPage === 'documents' && <div className="p-12 text-center text-stone-500">Document Management Module Coming Soon</div>}
+      </AdminLayout>
+    );
   }
 
-  // Render Parent Dashboard
+  // --- PARENT DASHBOARD ---
   if (loading || !student) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-brand-50">
