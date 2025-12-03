@@ -1,79 +1,70 @@
 
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, Button, Input, Badge } from '../../components/ui/AdminComponents';
-import { Search, Upload, Plus, Trash2, FileText } from '../../components/Icons';
+import { Card, Button, Input, Badge, Modal, Select, Label } from '../../components/ui/AdminComponents';
+import { Search, Plus, Trash2, Edit } from '../../components/Icons';
 
 const StudentsPage: React.FC = () => {
-  const [showUpload, setShowUpload] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<any>(null);
 
   // Mock Students List
   const students = [
-    { id: '1', name: 'Layaa Ramesh', adm: 'BLT-2458', class: 'Grade 3 - A', parent: 'Ramesh B' },
-    { id: '2', name: 'Aarav Gupta', adm: 'BLT-2459', class: 'Grade 4 - B', parent: 'Sanjay G' },
-    { id: '3', name: 'Meera Kapoor', adm: 'BLT-2460', class: 'Grade 2 - C', parent: 'Anjali K' },
-    { id: '4', name: 'Vihaan Reddy', adm: 'BLT-2461', class: 'Grade 1 - A', parent: 'Pradeep R' },
+    { id: '1', name: 'Layaa Ramesh', adm: 'BLT-2458', class: 'Grade 3', campus: 'OMR', status: 'Active' },
+    { id: '2', name: 'Aarav Gupta', adm: 'BLT-2459', class: 'Grade 4', campus: 'Velachery', status: 'Active' },
   ];
+
+  const openAdd = () => { setEditingStudent(null); setShowModal(true); };
+  const openEdit = (s: any) => { setEditingStudent(s); setShowModal(true); };
 
   return (
     <div className="space-y-6 animate-fade-in">
-      
-      {/* Action Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-           <h2 className="text-2xl font-bold text-stone-800">Students Directory</h2>
-           <p className="text-stone-500 text-sm">Manage student profiles and admissions</p>
+           <h2 className="text-2xl font-bold text-stone-800">Students Page</h2>
+           <p className="text-stone-500 text-sm">Manage student profiles (Master Directory)</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => setShowUpload(true)}>
-            <Upload className="w-4 h-4 mr-2" /> Import CSV
-          </Button>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" /> Add Student
-          </Button>
+          <Button onClick={openAdd}><Plus className="w-4 h-4 mr-2" /> Add Student</Button>
         </div>
       </div>
 
-      {/* Filters */}
-      <Card className="bg-stone-50/50">
-        <CardContent className="p-4 flex gap-4">
-           <Input placeholder="Search by name or admission no..." icon={<Search className="w-4 h-4" />} />
-           <select className="h-10 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500">
-             <option>All Grades</option>
-             <option>Grade 1</option>
-             <option>Grade 2</option>
-             <option>Grade 3</option>
-           </select>
-        </CardContent>
-      </Card>
-
-      {/* Table */}
       <Card>
+        <div className="p-4 flex gap-4 border-b border-stone-100">
+           <Input placeholder="Search Name, Admission No..." icon={<Search className="w-4 h-4" />} />
+           <Select className="max-w-[150px]">
+             <option>All Campuses</option>
+             <option>OMR</option>
+             <option>Velachery</option>
+             <option>Adyar</option>
+           </Select>
+           <Select className="max-w-[150px]">
+             <option>Active</option>
+             <option>Inactive</option>
+           </Select>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-stone-50 text-stone-500 font-medium border-b border-stone-100">
+            <thead className="bg-stone-50 text-stone-500 font-medium">
               <tr>
-                <th className="px-6 py-4">Student Name</th>
                 <th className="px-6 py-4">Admission No</th>
+                <th className="px-6 py-4">Student Name</th>
+                <th className="px-6 py-4">Campus</th>
                 <th className="px-6 py-4">Class</th>
-                <th className="px-6 py-4">Parent</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
               {students.map((student) => (
-                <tr key={student.id} className="hover:bg-stone-50/50 transition-colors">
+                <tr key={student.id} className="hover:bg-stone-50/50">
+                  <td className="px-6 py-4 font-mono text-stone-600">{student.adm}</td>
                   <td className="px-6 py-4 font-bold text-stone-800">{student.name}</td>
-                  <td className="px-6 py-4 text-stone-600 font-mono">{student.adm}</td>
-                  <td className="px-6 py-4 text-stone-600">{student.class}</td>
-                  <td className="px-6 py-4 text-stone-600">{student.parent}</td>
-                  <td className="px-6 py-4">
-                    <Badge variant="success">Active</Badge>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button className="text-stone-400 hover:text-red-500 transition-colors">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                  <td className="px-6 py-4">{student.campus}</td>
+                  <td className="px-6 py-4">{student.class}</td>
+                  <td className="px-6 py-4"><Badge variant="success">{student.status}</Badge></td>
+                  <td className="px-6 py-4 text-right flex justify-end gap-2">
+                    <button onClick={() => openEdit(student)} className="text-stone-400 hover:text-brand-600"><Edit className="w-4 h-4" /></button>
+                    <button className="text-stone-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}
@@ -82,31 +73,96 @@ const StudentsPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* Upload Modal (Simulation) */}
-      {showUpload && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-           <Card className="w-full max-w-lg animate-fade-in shadow-2xl">
-             <CardHeader className="flex justify-between items-center">
-               <CardTitle>Import Students</CardTitle>
-               <button onClick={() => setShowUpload(false)} className="text-stone-400 hover:text-stone-600">✕</button>
-             </CardHeader>
-             <CardContent>
-                <div className="border-2 border-dashed border-stone-200 rounded-xl p-8 text-center bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
-                   <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                     <FileText className="w-6 h-6" />
-                   </div>
-                   <p className="text-stone-800 font-medium">Click to upload CSV</p>
-                   <p className="text-xs text-stone-500 mt-1">Headers: admission_no, name, dob, class...</p>
-                </div>
-                <div className="mt-6 flex justify-end gap-3">
-                  <Button variant="secondary" onClick={() => setShowUpload(false)}>Cancel</Button>
-                  <Button onClick={() => { alert('Upload started...'); setShowUpload(false); }}>Upload Data</Button>
-                </div>
-             </CardContent>
-           </Card>
-        </div>
-      )}
+      {/* Expanded Modal to match Master Sheet fields */}
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editingStudent ? "Edit Student Details" : "Add New Student"}>
+         <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
+            
+            {/* 1. Profile & Academics */}
+            <div className="bg-stone-50 p-4 rounded-lg border border-stone-100">
+               <Label className="text-brand-600 font-bold uppercase text-xs mb-3 border-b border-stone-200 pb-1">Profile & Academics</Label>
+               <div className="grid grid-cols-2 gap-4 mb-4">
+                  <Input label="Name of the Child" />
+                  <Input label="Admission Number" placeholder="BLT-XXXX" />
+               </div>
+               <div className="grid grid-cols-2 gap-4 mb-4">
+                  <Select label="Gender">
+                     <option>Male</option>
+                     <option>Female</option>
+                  </Select>
+                  <Input label="Date of Birth" type="date" />
+               </div>
+               <div className="grid grid-cols-2 gap-4 mb-4">
+                   <Input label="Age as on Today" readOnly placeholder="Auto-calc" />
+                   <Input label="Aadhar Number" />
+               </div>
+               
+               <div className="grid grid-cols-2 gap-4 mb-4">
+                  <Select label="Location (Campus)">
+                     <option>OMR</option>
+                     <option>Velachery</option>
+                     <option>Adyar</option>
+                  </Select>
+                  <Input label="Entity" placeholder="School Board/Legal Entity" />
+               </div>
+               <div className="grid grid-cols-2 gap-4 mb-4">
+                  <Input label="Date of Joining" type="date" />
+               </div>
+            </div>
 
+            {/* 2. Class Details */}
+            <div className="bg-stone-50 p-4 rounded-lg border border-stone-100">
+               <Label className="text-brand-600 font-bold uppercase text-xs mb-3 border-b border-stone-200 pb-1">Class Classification</Label>
+               <div className="grid grid-cols-2 gap-4 mb-4">
+                  <Select label="Program Level">
+                     <option>Toddler</option>
+                     <option>Primary</option>
+                     <option>Elementary</option>
+                     <option>Adolescent</option>
+                  </Select>
+                  <Input label="Division Name" placeholder="e.g. A, B, Rose, Lily" />
+               </div>
+               <div className="grid grid-cols-2 gap-4">
+                  <Input label="Grades as per NEP" placeholder="e.g. Grade 3" />
+               </div>
+            </div>
+
+            {/* 3. Parents Information */}
+            <div className="bg-stone-50 p-4 rounded-lg border border-stone-100">
+               <Label className="text-brand-600 font-bold uppercase text-xs mb-3 border-b border-stone-200 pb-1">Father's Details</Label>
+               <div className="space-y-3 mb-4">
+                  <Input label="Father's Name" />
+                  <div className="grid grid-cols-2 gap-4">
+                     <Input label="Contact No." />
+                     <Input label="Email ID" />
+                  </div>
+               </div>
+
+               <Label className="text-brand-600 font-bold uppercase text-xs mb-3 border-b border-stone-200 pb-1">Mother's Details</Label>
+               <div className="space-y-3">
+                  <Input label="Mother's Name" />
+                  <div className="grid grid-cols-2 gap-4">
+                     <Input label="Contact No." />
+                     <Input label="Email ID" />
+                  </div>
+               </div>
+            </div>
+
+            {/* 4. Contact & Emergency */}
+            <div className="bg-stone-50 p-4 rounded-lg border border-stone-100">
+               <Label className="text-brand-600 font-bold uppercase text-xs mb-3 border-b border-stone-200 pb-1">Contact & Emergency</Label>
+               <Input label="Address for Communication" className="mb-4" />
+               <div className="grid grid-cols-2 gap-4">
+                  <Input label="Emergency Contact Person" />
+                  <Input label="Emergency Ph.No" />
+               </div>
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4 border-t border-stone-100 sticky bottom-0 bg-white p-2">
+               <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
+               <Button onClick={() => setShowModal(false)}>Save Student</Button>
+            </div>
+         </div>
+      </Modal>
     </div>
   );
 };

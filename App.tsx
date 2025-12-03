@@ -14,7 +14,13 @@ import { Student, DocumentItem, CalendarEvent, CarouselImage } from './types';
 import AdminLayout from './app/admin/AdminLayout';
 import DashboardPage from './app/admin/DashboardPage';
 import StudentsPage from './app/admin/StudentsPage';
-import CalendarPage from './app/admin/CalendarPage';
+import ParentsPage from './app/admin/ParentsPage';
+import EventsPage from './app/admin/EventsPage';
+import SchedulerPage from './app/admin/SchedulerPage';
+import DocumentsPage from './app/admin/DocumentsPage';
+import NewslettersPage from './app/admin/NewslettersPage';
+import CommunicationPage from './app/admin/CommunicationPage';
+import CurriculumPage from './app/admin/CurriculumPage';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -88,8 +94,13 @@ const App: React.FC = () => {
       >
         {adminPage === 'dashboard' && <DashboardPage />}
         {adminPage === 'students' && <StudentsPage />}
-        {adminPage === 'calendar' && <CalendarPage />}
-        {adminPage === 'documents' && <div className="p-12 text-center text-stone-500">Document Management Module Coming Soon</div>}
+        {adminPage === 'parents' && <ParentsPage />}
+        {adminPage === 'events' && <EventsPage />}
+        {adminPage === 'scheduler' && <SchedulerPage />}
+        {adminPage === 'documents' && <DocumentsPage />}
+        {adminPage === 'newsletters' && <NewslettersPage />}
+        {adminPage === 'communication' && <CommunicationPage />}
+        {adminPage === 'curriculum' && <CurriculumPage />}
       </AdminLayout>
     );
   }

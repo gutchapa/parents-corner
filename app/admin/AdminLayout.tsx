@@ -1,6 +1,9 @@
 
 import React, { useState } from 'react';
-import { LogOut, LayoutDashboard, Users, CalendarIcon, FileText, Settings, User } from '../../components/Icons';
+import { 
+  LogOut, LayoutDashboard, Users, CalendarIcon, FileText, Settings, User, 
+  MessageCircle, Newspaper, CalendarCheck, GraduationCap
+} from '../../components/Icons';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -13,10 +16,15 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onLogout, currentPa
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> }, // Need to make sure this icon exists or use generic
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { id: 'students', label: 'Students', icon: <Users className="w-5 h-5" /> },
-    { id: 'calendar', label: 'Calendar', icon: <CalendarIcon className="w-5 h-5" /> },
-    { id: 'documents', label: 'Documents', icon: <FileText className="w-5 h-5" /> },
+    { id: 'parents', label: 'Parents', icon: <User className="w-5 h-5" /> },
+    { id: 'events', label: 'Events', icon: <CalendarIcon className="w-5 h-5" /> },
+    { id: 'scheduler', label: 'Meeting Scheduler', icon: <CalendarCheck className="w-5 h-5" /> },
+    { id: 'documents', label: 'Reports & Receipts', icon: <FileText className="w-5 h-5" /> },
+    { id: 'newsletters', label: 'Newsletters', icon: <Newspaper className="w-5 h-5" /> },
+    { id: 'curriculum', label: 'Curriculum', icon: <GraduationCap className="w-5 h-5" /> },
+    { id: 'communication', label: 'WhatsApp', icon: <MessageCircle className="w-5 h-5" /> },
   ];
 
   return (
@@ -31,7 +39,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onLogout, currentPa
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {menuItems.map((item) => (
             <button
               key={item.id}
@@ -63,14 +71,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onLogout, currentPa
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-6 shadow-sm">
-          <h2 className="text-lg font-bold text-stone-800 capitalize">{currentPage}</h2>
+        <header className="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-6 shadow-sm flex-shrink-0">
+          <h2 className="text-lg font-bold text-stone-800 capitalize flex items-center gap-2">
+            {menuItems.find(i => i.id === currentPage)?.icon}
+            {menuItems.find(i => i.id === currentPage)?.label || currentPage}
+          </h2>
           <div className="flex items-center gap-4">
              <div className="flex items-center gap-3 bg-stone-50 px-3 py-1.5 rounded-full border border-stone-100">
                 <div className="w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center text-brand-700">
                    <User className="w-5 h-5" />
                 </div>
-                <span className="text-sm font-medium text-stone-700 pr-2">Administrator</span>
+                <div className="text-right hidden md:block">
+                  <div className="text-xs font-bold text-stone-800">Admin User</div>
+                  <div className="text-[10px] text-stone-500">Super Admin</div>
+                </div>
              </div>
           </div>
         </header>
